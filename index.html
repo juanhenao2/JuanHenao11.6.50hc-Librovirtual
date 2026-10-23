@@ -1,631 +1,86 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Proyecto 50 Horas - Juan Esteban Henao</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    
-    body {
-      background: radial-gradient(circle, #2c1b18 0%, #0f0807 100%);
-      font-family: 'Georgia', serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: #2b2b2b;
-      padding: 20px 0;
-      overflow-x: hidden;
-    }
-
-    /* PANTALLA DE BIENVENIDA (MODAL INICIAL) */
-    #welcome-screen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: radial-gradient(circle, #3a1507 0%, #0f0705 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      color: #e5c158;
-      text-align: center;
-      padding: 20px;
-    }
-
-    #welcome-screen h1 {
-      font-size: 2.2rem;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
-    }
-
-    #welcome-screen p {
-      font-size: 1.1rem;
-      color: #f0e2be;
-      margin-bottom: 30px;
-    }
-
-    .btn-open-book {
-      background: linear-gradient(180deg, #e5c158 0%, #8a6d1c 100%);
-      color: #1a0802;
-      border: 2px solid #fff;
-      padding: 15px 40px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      border-radius: 30px;
-      cursor: pointer;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.6);
-      transition: transform 0.2s, background 0.2s;
-    }
-
-    .btn-open-book:hover {
-      transform: scale(1.05);
-      background: #f5d168;
-    }
-
-    header h1 {
-      color: #e5c158;
-      font-size: 1.4rem;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 4px;
-      text-align: center;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-    }
-
-    .instruction-tag {
-      color: #f0e2be;
-      font-size: 0.85rem;
-      font-style: italic;
-      margin-bottom: 12px;
-      opacity: 0.9;
-    }
-
-    .book-container {
-      width: 960px;
-      height: 640px;
-      position: relative;
-    }
-
-    .book {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      background: #0f0705;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.9);
-      border-radius: 8px;
-      overflow: hidden;
-      border: 4px solid #b89130;
-    }
-
-    /* TEXTURA Y ESTILO DE PÁGINAS */
-    .page-side {
-      width: 50%;
-      height: 100%;
-      padding: 30px 35px;
-      /* Textura tipo papel antiguo con gradiente suave */
-      background: #fdfbf7 linear-gradient(to right, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0) 5%, rgba(0,0,0,0) 95%, rgba(0,0,0,0.05) 100%);
-      overflow-y: auto;
-      position: relative;
-      border-right: 1px solid #e2d7c5;
-      box-shadow: inset 0 0 20px rgba(184, 145, 48, 0.1);
-    }
-
-    .cover-side {
-      background: linear-gradient(135deg, #3a1507 0%, #170702 100%);
-      color: #e5c158;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      border: 2px solid #b89130;
-    }
-
-    .cover-side h2 {
-      font-size: 1.5rem;
-      border-bottom: 2px solid #b89130;
-      padding-bottom: 10px;
-      margin-bottom: 15px;
-      text-transform: uppercase;
-    }
-
-    .cover-side p { color: #f0e2be; font-size: 0.85rem; margin: 4px 0; }
-
-    h2.mod-title {
-      font-size: 1.1rem;
-      color: #7a1c0d;
-      border-bottom: 2px solid #7a1c0d;
-      padding-bottom: 4px;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-    }
-
-    h3.ses-title {
-      font-size: 0.88rem;
-      color: #3b2219;
-      margin-top: 10px;
-      margin-bottom: 6px;
-      border-left: 3px solid #b89130;
-      padding-left: 8px;
-    }
-
-    p, li {
-      font-size: 0.76rem;
-      line-height: 1.45;
-      color: #2b2b2b;
-      text-align: justify;
-      margin-bottom: 8px;
-    }
-
-    ul { padding-left: 18px; margin-bottom: 8px; }
-
-    /* ESTILOS DEL ÍNDICE INTERACTIVO */
-    .index-list {
-      list-style: none;
-      padding-left: 0;
-    }
-
-    .index-list li {
-      margin-bottom: 6px;
-      cursor: pointer;
-      padding: 3px 6px;
-      border-radius: 4px;
-      transition: background 0.2s, color 0.2s;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .index-list li:hover {
-      background: #7a1c0d;
-      color: #ffffff;
-    }
-
-    .page-num {
-      position: absolute;
-      bottom: 8px;
-      font-size: 0.72rem;
-      color: #888;
-    }
-    .left-num { left: 20px; }
-    .right-num { right: 20px; }
-
-    .fig-box {
-      background: #f4efe4;
-      border: 1px dashed #7a1c0d;
-      padding: 8px;
-      margin: 8px 0;
-      font-size: 0.75rem;
-    }
-
-    .case-box {
-      background: #faf6ed;
-      border-left: 3px solid #7a1c0d;
-      padding: 8px;
-      margin-bottom: 8px;
-    }
-
-    .controls {
-      margin-top: 15px;
-      display: flex;
-      gap: 20px;
-      align-items: center;
-    }
-
-    button.nav-btn {
-      background: linear-gradient(180deg, #d4af37 0%, #8a6d1c 100%);
-      border: 1px solid #fff;
-      color: #1a0802;
-      padding: 8px 20px;
-      font-weight: bold;
-      border-radius: 20px;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    }
-
-    button.nav-btn:hover { background: #e5c158; }
-
-    .spread { display: none; width: 100%; height: 100%; }
-    .spread.active { display: flex; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#102a43">
+<meta name="description" content="Libro virtual de Estudios Constitucionales y Formación Ciudadana de Juan Esteban Henao Rivillas.">
+<title>Estudio Constitucional | Libro virtual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#102a43;--blue:#1d4e89;--gold:#e8b04a;--paper:#fffdf7;--ink:#243447}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#244e70,#0b1928 70%);color:#f5f7fa;font-family:'DM Sans',sans-serif;min-height:100vh}
+header{display:flex;justify-content:space-between;align-items:center;padding:18px clamp(16px,4vw,48px);border-bottom:1px solid #ffffff26}
+.brand{font-weight:700;letter-spacing:.12em;font-size:.82rem}.brand span{color:var(--gold)}
+header button,.controls button,.action{border:1px solid #ffffff50;background:#ffffff12;color:#fff;border-radius:999px;padding:10px 15px;cursor:pointer;font:inherit}
+header button:hover,.controls button:hover,.action:hover{background:#ffffff25}
+main{max-width:1200px;margin:auto;padding:24px 18px 42px}
+.intro{text-align:center;margin:22px auto 24px;max-width:780px}.eyebrow{color:var(--gold);text-transform:uppercase;letter-spacing:.2em;font-size:.75rem;font-weight:700}
+h1,h2{font-family:'Playfair Display',serif}h1{font-size:clamp(2rem,5vw,3.8rem);line-height:1.08;margin:12px 0} .intro p{color:#d4e0eb;line-height:1.7}
+.reader{position:relative;max-width:1000px;margin:auto}.book-shell{min-height:350px;display:flex;align-items:center;justify-content:center}
+#book{margin:auto!important}.page{background:var(--paper);color:var(--ink);overflow:hidden;box-shadow:0 10px 25px #0003}.page canvas{display:block;width:100%;height:100%;object-fit:contain;background:var(--paper)}
+.cover{height:100%;padding:28px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(145deg,#102a43,#1d4e89);color:white;border:8px solid #e8b04a;outline:1px solid #e8b04a;outline-offset:-15px;text-align:center}
+.cover .seal{font-size:2.5rem}.cover h2{font-size:clamp(1.2rem,2vw,2rem);line-height:1.2}.cover .sub{color:#f5d89a;letter-spacing:.12em;text-transform:uppercase;font-size:.7rem}.cover .author{line-height:1.6;font-size:.88rem}
+.controls{display:flex;justify-content:center;align-items:center;gap:12px;margin:20px 0 10px;flex-wrap:wrap}.counter{font-variant-numeric:tabular-nums;color:#d4e0eb;min-width:130px;text-align:center;font-size:.9rem}
+.hint{text-align:center;color:#b7c8d8;font-size:.82rem;margin:12px 0 30px}
+.bottom{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:1000px;margin:0 auto}.panel{background:#ffffff0d;border:1px solid #ffffff20;border-radius:16px;padding:18px}.panel h3{margin:0 0 10px;color:#f5d89a;font-family:'Playfair Display',serif}.panel p{margin:0;color:#d4e0eb;line-height:1.6;font-size:.9rem}
+#toc{display:none;max-width:1000px;margin:0 auto 22px;background:#fffdf7;color:var(--ink);border-radius:14px;padding:18px;max-height:340px;overflow:auto}#toc.open{display:block}.toc-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.toc-list button{padding:10px;text-align:left;background:#f0f4f8;border:1px solid #d9e2ec;border-radius:9px;color:var(--ink);cursor:pointer}.toc-list button:hover{background:#e1ecf4}
+footer{text-align:center;padding:22px;color:#aebdca;font-size:.78rem}
+@media(max-width:650px){header{padding:14px}.brand{font-size:.7rem}main{padding:12px 10px 28px}.book-shell{min-height:280px}.bottom{grid-template-columns:1fr}.toc-list{grid-template-columns:1fr}.controls button{padding:9px 12px}}
+</style>
 </head>
 <body>
-
-  <!-- PANTALLA INICIAL DE APERTURA -->
-  <div id="welcome-screen">
-    <h1>Proyecto 50 Horas Constitucionales</h1>
-    <p>Juan Esteban Henao Rivillas — Grado 11°6</p>
-    <button class="btn-open-book" onclick="openBook()">📖 Abrir Libro Virtual</button>
-  </div>
-
-  <header>
-    <h1>Proyecto 50 Horas Constitucionales</h1>
-  </header>
-  
-  <div class="instruction-tag">📖 Para pasar de hoja utilice los botones inferiores o presione sobre el índice para saltar a una página</div>
-
-  <div class="book-container">
-    <div class="book">
-
-      <!-- DESPLIEGUE 1: PORTADA Y CONTENIDO -->
-      <div class="spread active" id="spread-0">
-        <div class="page-side cover-side">
-          <h2>PROYECTO 50 HORAS</h2>
-          <p><b>Estudios Constitucionales</b></p><br>
-          <p><b>Juan Esteban Henao Rivillas</b></p>
-          <p>Grado 11°6</p><br>
-          <p><b>Instituto Técnico Industrial Pascual Bravo</b></p>
-          <p>Área de Ciencias Sociales y Estudios Constitucionales</p>
-          <p><b>Docente:</b> Gilberto Ospina Marroquín</p><br>
-          <p>Medellín, Colombia</p>
-          <p>2026</p>
-        </div>
-        <div class="page-side">
-          <h2 class="mod-title">Tabla de Contenido</h2>
-          <ul class="index-list">
-            <li onclick="goToSpread(1)"><span><b>Introducción</b></span> <span>Pág. 3</span></li>
-            <li onclick="goToSpread(1)"><span><b>Módulo 1:</b> Fundamentos de la Constitución</span> <span>Pág. 3</span></li>
-            <li onclick="goToSpread(1)"><span><b>Sesión 1:</b> Historia Constitucional</span> <span>Pág. 3</span></li>
-            <li onclick="goToSpread(3)"><span><b>Sesión 2:</b> Principios Fundamentales</span> <span>Pág. 4</span></li>
-            <li onclick="goToSpread(3)"><span><b>Sesión 3:</b> Derechos Fundamentales</span> <span>Pág. 5</span></li>
-            <li onclick="goToSpread(4)"><span><b>Sesión 4:</b> Deberes Ciudadanos</span> <span>Pág. 6</span></li>
-            <li onclick="goToSpread(5)"><span><b>Módulo 2:</b> Estructura y Funcionamiento</span> <span>Pág. 9</span></li>
-            <li onclick="goToSpread(5)"><span><b>Sesión 6:</b> Ramas del Poder Político</span> <span>Pág. 9</span></li>
-            <li onclick="goToSpread(5)"><span><b>Sesión 7:</b> Órganos de Control</span> <span>Pág. 10</span></li>
-            <li onclick="goToSpread(6)"><span><b>Sesión 8:</b> Participación Ciudadana</span> <span>Pág. 10</span></li>
-            <li onclick="goToSpread(7)"><span><b>Módulo 3:</b> Ciudadanía y Democracia</span> <span>Pág. 13</span></li>
-            <li onclick="goToSpread(8)"><span><b>Módulo 4:</b> Constitución en la Vida Cotidiana</span> <span>Pág. 16</span></li>
-            <li onclick="goToSpread(8)"><span><b>Sesión 16:</b> Taller de Casos Prácticos</span> <span>Pág. 17</span></li>
-            <li onclick="goToSpread(9)"><span><b>Módulo 5:</b> Realidad Social Contemporánea</span> <span>Pág. 19</span></li>
-            <li onclick="goToSpread(10)"><span><b>Ensayo Final</b></span> <span>Pág. 21</span></li>
-            <li onclick="goToSpread(11)"><span><b>Bibliografía y Cibergrafía</b></span> <span>Pág. 23</span></li>
-          </ul>
-          <span class="page-num right-num">Pág. 2</span>
-        </div>
-      </div>
-
-      <!-- DESPLIEGUE 2: INTRODUCCIÓN Y MÓDULO 1 -->
-      <div class="spread" id="spread-1">
-        <div class="page-side">
-          <h2 class="mod-title">Introducción</h2>
-          <p>Colombia es una nación forjada a través de siglos de historia constitucional que han definido su identidad como Estado. Desde sus primeras cartas fundamentales hasta la Constitución de 1991, el recorrido histórico del país refleja una constante búsqueda por consolidar los principios de soberanía popular, democracia y participación ciudadana como pilares del orden político.</p>
-          <p>Este camino no puede entenderse sin reconocer los derechos fundamentales que la Constitución garantiza a cada ciudadano, ni sin asumir los deberes ciudadanos que hacen posible la convivencia y el ejercicio pleno de esos derechos.</p>
-          <p>Conocer esta historia, sus hitos y transformaciones a través del tiempo, no solo nos permite comprender quiénes somos como pueblo, sino también fortalecer nuestra capacidad de participar activa y responsablemente en la construcción de una sociedad más justa y democrática.</p>
-          <span class="page-num left-num">Pág. 3</span>
-        </div>
-        <div class="page-side">
-          <h2 class="mod-title">Módulo 1. Fundamentos</h2>
-          <h3 class="ses-title">Sesión 1: Historia Constitucional</h3>
-          <p>La evolución constitucional de Colombia se divide en diversos períodos marcados por la inestabilidad política y el debate constante entre el centralismo y el federalismo. A continuación, se detallan los principales hitos cronológicos:</p>
-          <ul>
-            <li><b>1810:</b> El 20 de julio se firma el Acta de Independencia en Santa Fe, surgen juntas de gobierno y comienza el periodo de las "Patrias Bobas" con las primeras ideas constitucionales.</li>
-            <li><b>1811:</b> Se crea la Constitución de Cundinamarca, primera del territorio, que establece una monarquía constitucional con separación de poderes y reconocimiento de derechos.</li>
-            <li><b>1819:</b> Tras la Batalla de Boyacá se promulga la Ley Fundamental que crea la Gran Colombia, uniendo varios territorios bajo el liderazgo de Simón Bolívar.</li>
-          </ul>
-          <span class="page-num right-num">Pág. 3</span>
-        </div>
-      </div>
-
-      <!-- DESPLIEGUE 3: HISTORIA PARTE 2 -->
-      <div class="spread" id="spread-2">
-        <div class="page-side">
-          <h3 class="ses-title">Historia Constitucional (Continuación)</h3>
-          <ul>
-            <li><b>1821:</b> La Constitución de Cúcuta organiza la Gran Colombia como un Estado centralista, estableciendo libertades como la de prensa y medidas como la libertad de vientres.</li>
-            <li><b>1830:</b> Se propone una constitución de carácter autoritario y se produce la disolución de la Gran Colombia, dando paso a nuevos Estados independientes.</li>
-            <li><b>1832:</b> Se establece la Constitución de Nueva Granada, organizando el país como una república independiente con tendencias federalistas.</li>
-            <li><b>1843:</b> Se expide una constitución centralista que fortalece el poder del presidente y limita la participación política.</li>
-            <li><b>1853:</b> Se promulga una constitución liberal que introduce el sufragio universal masculino, la separación entre Iglesia y Estado y mayores libertades individuales.</li>
-          </ul>
-          <span class="page-num left-num">Pág. 4</span>
-        </div>
-        <div class="page-side">
-          <h3 class="ses-title">Historia Constitucional (Continuación)</h3>
-          <ul>
-            <li><b>1863:</b> La Constitución de Rionegro establece un federalismo radical con estados soberanos, amplias libertades y gran autonomía regional.</li>
-            <li><b>1886:</b> Se crea una constitución centralista durante la Regeneración que fortalece el Estado, la Iglesia y el poder ejecutivo, vigente por más de un siglo.</li>
-            <li><b>1910:</b> Reforma constitucional que limita el poder presidencial, introduce el control constitucional y promueve mayor equilibrio institucional.</li>
-            <li><b>1936:</b> La reforma liberal establece la función social de la propiedad y amplía derechos y libertades.</li>
-            <li><b>1957:</b> Se aprueba el Frente Nacional y se reconoce por primera vez el derecho al voto de las mujeres.</li>
-            <li><b>1991:</b> Se promulga la actual Constitución Política que define a Colombia como un Estado Social de Derecho.</li>
-          </ul>
-          <div class="fig-box">
-            <b>Figura 1:</b> Línea del tiempo de la historia constitucional de Colombia de 1810 a 1991 (Sintetiza 11 modelos constitucionales).
-          </div>
-          <span class="page-num right-num">Pág. 4</span>
-        </div>
-      </div>
-
-      <!-- DESPLIEGUE 4: PRINCIPIOS Y DERECHOS -->
-      <div class="spread" id="spread-3">
-        <div class="page-side">
-          <h3 class="ses-title">Sesión 2: Principios Fundamentales</h3>
-          <p><b>Soberanía:</b> La soberanía es el poder máximo que tiene un Estado o un pueblo para tomar decisiones sobre su propio territorio, su gobierno y sus leyes, sin depender de ninguna autoridad externa. En una democracia, la soberanía reside en el pueblo.</p>
-          <p><b>Democracia:</b> Forma de gobierno en la cual el poder político pertenece al pueblo. Los ciudadanos participan mediante el voto, el respeto por los derechos humanos, la igualdad ante la ley y la libertad de expresión.</p>
-          <p><b>Participación:</b> Proceso mediante el cual las personas se involucran activamente en los asuntos públicos y en la toma de decisiones que afectan a su comunidad.</p>
-          <span class="page-num left-num">Pág. 4-5</span>
-        </div>
-        <div class="page-side">
-          <h3 class="ses-title">Sesión 3: Derechos Fundamentales</h3>
-          <p>Los derechos fundamentales son el conjunto de garantías, libertades y facultades esenciales que tiene toda persona por el solo hecho de ser humana. Su propósito es asegurar la dignidad humana, la libertad, la igualdad y el desarrollo integral.</p>
-          <p>Son universales, inalienables, irrenunciables e imprescriptibles. En Colombia están protegidos mediante la <b>Acción de Tutela</b>.</p>
-          <ul>
-            <li><b>Derecho a la vida:</b> El derecho esencial base para los demás.</li>
-            <li><b>Derecho a la igualdad:</b> Trato equitativo sin discriminación.</li>
-            <li><b>Derecho a la libertad personal:</b> Protección contra detenciones arbitrarias.</li>
-          </ul>
-          <span class="page-num right-num">Pág. 5</span>
-        </div>
-      </div>
-
-      <!-- DESPLIEGUE 5: LISTA DE DERECHOS Y DEBERES -->
-      <div class="spread" id="spread-4">
-        <div class="page-side">
-          <h3 class="ses-title">Derechos Fundamentales (Continuación)</h3>
-          <ul>
-            <li><b>Libre desarrollo de la personalidad:</b> Autonomía de decisión de vida.</li>
-            <li><b>Libertad de expresión:</b> Comunicar e informar libremente.</li>
-            <li><b>Libertad de cultos:</b> Practicar libremente cualquier creencia.</li>
-            <li><b>Derecho a la familia:</b> Protección al núcleo social.</li>
-            <li><b>Derecho a la educación:</b> Formación integral obligatoria en la básica.</li>
-            <li><b>Derecho a la salud:</b> Acceso a servicios oportunos de calidad.</li>
-            <li><b>Derecho al debido proceso:</b> Juzgamiento justo e imparcial.</li>
-            <li><b>Derecho de petición:</b> Solicitudes respetuosas a autoridades.</li>
-            <li><b>Derecho a la participación política:</b> Votar y ser elegido.</li>
-            <li><b>Buen nombre, honra e intimidad:</b> Protección de la privacidad.</li>
-          </ul>
-          <span class="page-num left-num">Pág. 6</span>
-        </div>
-        <div class="page-side">
-          <h3 class="ses-title">Sesión 4: Deberes Ciudadanos</h3>
-          <p>Obligaciones para garantizar la convivencia y el buen funcionamiento del Estado (Art. 95 de la Constitución):</p>
-          <ul>
-            <li>Respetar los derechos ajenos y no abusar de los propios.</li>
-            <li>Obrar con solidaridad social ante situaciones de peligro.</li>
-            <li>Respetar y apoyar a las autoridades legítimas.</li>
-            <li>Defender la soberanía y la integridad nacional.</li>
-            <li>Contribuir con los impuestos de ley.</li>
-            <li>Participar en la vida política y democrática.</li>
-            <li>Proteger el medio ambiente y recursos naturales.</li>
-            <li>Promover la paz y la convivencia pacífica.</li>
-          </ul>
-          <div class="fig-box">
-            <b>Figura 2:</b> Hitos institucionales de la evolución del Estado (1810-1991).
-          </div>
-          <span class="page-num right-num">Pág. 6-8</span>
-        </div>
-      </div>
-
-      <!-- DESPLIEGUE 6: MÓDULO 2 - RAMAS Y ÓRGANOS -->
-      <div class="spread" id="spread-5">
-        <div class="page-side">
-          <h2 class="mod-title">Módulo 2. Estructura del Estado</h2>
-          <h3 class="ses-title">Sesión 6: Las Ramas del Poder Político</h3>
-          <p><b>Rama Ejecutiva:</b> Administra el Estado y hace cumplir las leyes. Encabezada por el Presidente, ministros, gobernadores y alcaldes.</p>
-          <p><b>Rama Legislativa:</b> Crea, modifica y deroga leyes. Representada por el Congreso de la República (Senado y Cámara de Representantes).</p>
-          <p><b>Rama Judicial:</b> Administra justicia y garantiza la Constitución. Conformada por Corte Suprema, Corte Constitucional, Consejo de Estado y jueces.</p>
-          <p><b>Importancia:</b> Evita la concentración del poder y fortalece el equilibrio democrático.</p>
-          <span class="page-num left-num">Pág. 9</span>
-        </div>
-        <div class="page-side">
-          <h3 class="ses-title">Sesión 7: Órganos de Control</h3>
-          <p><b>Contraloría General:</b> Ejerce control fiscal sobre recursos públicos (ej. audita contratos del INVIAS o ANI).</p>
-          <p><b>Procuraduría General:</b> Control disciplinario a servidores públicos, con capacidad de investigar e inhabilitar funcionarios corruptos.</p>
-          <p><b>Defensoría del Pueblo:</b> Promueve y defiende derechos humanos frente a abusos o desplazamientos.</p>
-          <p><b>Fiscalía General:</b> Investiga y acusa penalmente a quienes cometen delitos.</p>
-          <span class="page-num right-num">Pág. 10</span>
-        </div>
-      </div>
-
-      <!-- DESPLIEGUE 7: PARTICIPACIÓN Y DEBATE CONGRESO -->
-      <div class="spread" id="spread-6">
-        <div class="page-side">
-          <h3 class="ses-title">Sesión 8: Participación Ciudadana</h3>
-          <ul>
-            <li><b>Votaciones electorales:</b> Elección de representantes públicos.</li>
-            <li><b>Cabildos abiertos:</b> Reuniones públicas locales con concejos.</li>
-            <li><b>Veedurías ciudadanas:</b> Vigilancia comunitaria a proyectos del Estado.</li>
-            <li><b>Derecho de petición:</b> Requerimientos formales a entidades públicas.</li>
-            <li><b>Consultas populares y referendos:</b> Decisión directa sobre temas clave.</li>
-          </ul>
-          <h3 class="ses-title">Sesión 9: Separación de Poderes</h3>
-          <p>Revisión judicial de leyes por la Corte Constitucional, control político del Congreso al Gobierno y juzgamiento de altos funcionarios públicos.</p>
-          <span class="page-num left-num">Pág. 10-11</span>
-        </div>
-        <div class="page-side">
-          <h3 class="ses-title">Sesión 10: Debate en el Congreso</h3>
-          <p>Foro sobre emisiones de metano y crisis climática. Se evidenció que la ganadería extensiva genera el 65% de las emisiones de metano en Colombia. Expertos demostraron que con sistemas silvopastoriles las emisiones se reducen de 74 kg a 24 kg de CO₂ equivalente por kilo de carne, destacando la necesidad de mayor voluntad política y normatividad.</p>
-          <h3 class="ses-title">Conclusión del Módulo 2</h3>
-          <p>El equilibrio entre ramas y el control ciudadana son los pilares fundamentales para prevenir la corrupción y asegurar la transparencia del Estado.</p>
-          <span class="page-num right-num">Pág. 11-12</span>
-        </div>
-      </div>
-
-      <!-- DESPLIEGUE 8: MÓDULO 3 - CIUDADANÍA Y ELECCIONES -->
-      <div class="spread" id="spread-7">
-        <div class="page-side">
-          <h2 class="mod-title">Módulo 3. Ciudadanía y Democracia</h2>
-          <h3 class="ses-title">Sesión 11: Mecanismos de Participación</h3>
-          <p><b>Plebiscito:</b> Consulta presidencial sobre decisiones políticas clave (ej. Acuerdo de paz 2016).</p>
-          <p><b>Referendo:</b> Aprobación o derogación popular de normas o reformas.</p>
-          <p><b>Cabildo Abierto:</b> Debate directo de la comunidad con las autoridades locales.</p>
-          <p><b>Asamblea Constituyente:</b> Órgano electo para redactar o reformar la Constitución (ej. 1991).</p>
-          <span class="page-num left-num">Pág. 13</span>
-        </div>
-        <div class="page-side">
-          <h3 class="ses-title">Sesión 12 y 13: Elecciones y Rastreo</h3>
-          <p>Mecanismos para definir la representación en el Estado:</p>
-          <p><b>Sistema Mayoritario:</b> Gana la candidatura con más votos (Presidente, Alcaldes).</p>
-          <p><b>Sistema Proporcional:</b> Distribuye curules según el porcentaje obtenido (Congreso, Concejos).</p>
-          <p><b>Rastreo Electoral:</b> Análisis a través de noticias, imágenes de campaña y estadísticas numéricas de votación.</p>
-          <span class="page-num right-num">Pág. 13-15</span>
-        </div>
-      </div>
-
-      <!-- DESPLIEGUE 9: MÓDULO 4 - VIDA COTIDIANA Y TALLER (CASOS 1 Y 2) -->
-      <div class="spread" id="spread-8">
-        <div class="page-side">
-          <h2 class="mod-title">Módulo 4. Vida Cotidiana</h2>
-          <h3 class="ses-title">Sesión 14: Derechos en Escuela y Comunidad</h3>
-          <p><b>En la escuela:</b> Educación de calidad, respeto, igualdad, participación, ambiente seguro y salud.</p>
-          <p><b>En la comunidad:</b> Identidad, protección contra abusos, recreación y ambiente sano.</p>
-          <h3 class="ses-title">Sesión 15: Resolución Pacífica</h3>
-          <p>Solución de conflictos mediante el diálogo, el entendimiento, la tolerancia y la mediación pacífica.</p>
-          <span class="page-num left-num">Pág. 16-17</span>
-        </div>
-        <div class="page-side">
-          <h3 class="ses-title">Sesión 16: Taller de Casos Prácticos</h3>
-          <div class="case-box">
-            <b>Caso 1: Derecho a la Educación</b><br>
-            <i>Caso:</i> María (14 años) no asiste a clases por falta de transporte en su zona rural.<br>
-            <i>Análisis:</i> Se afecta el acceso a la formación de calidad sin discriminación.<br>
-            <i>Solución:</i> El Estado debe proveer transporte gratuito o apoyos rurales.<br>
-            <i>Conclusión:</i> Vulneración del derecho a la educación; exige intervención estatal.
-          </div>
-          <div class="case-box">
-            <b>Caso 2: Libertad de Expresión</b><br>
-            <i>Caso:</i> Estudiante sancionado por opinar críticamente sobre su colegio en redes.<br>
-            <i>Análisis:</i> La opinión está protegida mientras sea respetuosa.<br>
-            <i>Solución:</i> Abrir espacios de diálogo institucional sin sanciones injustificadas.<br>
-            <i>Conclusión:</i> Expresión protegida al no incluir faltas al respeto o calumnias.
-          </div>
-          <span class="page-num right-num">Pág. 17-18</span>
-        </div>
-      </div>
-
-      <!-- DESPLIEGUE 10: TALLER (CASOS 3 Y 4) Y MÓDULO 5 -->
-      <div class="spread" id="spread-9">
-        <div class="page-side">
-          <h3 class="ses-title">Taller de Casos Prácticos (Continuación)</h3>
-          <div class="case-box">
-            <b>Caso 3: Derecho a la Información</b><br>
-            <i>Caso:</i> Periódico publica investigación sobre problemas ambientales comunitarios.<br>
-            <i>Análisis:</i> Los ciudadanos tienen derecho a recibir información veraz y oportuna.<br>
-            <i>Solución:</i> Verificación responsable de datos antes de comunicar.<br>
-            <i>Conclusión:</i> La información veraz fortalece la democracia.
-          </div>
-          <div class="case-box">
-            <b>Caso 4: Derecho a la Igualdad</b><br>
-            <i>Caso:</i> Exclusión de un estudiante por su origen étnico.<br>
-            <i>Análisis:</i> Garantía de mismos derechos sin discriminación alguna.<br>
-            <i>Solución:</i> Inclusión y sanciones institucionales contra el racismo.<br>
-            <i>Conclusión:</i> La exclusión por etnia vulnera directamente el derecho a la igualdad.
-          </div>
-          <span class="page-num left-num">Pág. 18-19</span>
-        </div>
-        <div class="page-side">
-          <h2 class="mod-title">Módulo 5. Realidad Social</h2>
-          <h3 class="ses-title">Sesión 17: Retos Contemporáneos</h3>
-          <p><b>Desigualdad social y económica:</b> Brechas de ingresos y oportunidades laborales.</p>
-          <p><b>Corrupción:</b> Abuso de poder que carcome la confianza institucional.</p>
-          <p><b>Crisis ambiental:</b> Cambio climático, contaminación y necesidad de sostenibilidad.</p>
-          <p><b>Derechos de minorías:</b> Inclusión plena de comunidades étnicas, discapacidad y LGBTQ+.</p>
-          <span class="page-num right-num">Pág. 19</span>
-        </div>
-      </div>
-
-      <!-- DESPLIEGUE 11: REFORMAS Y ENSAYO -->
-      <div class="spread" id="spread-10">
-        <div class="page-side">
-          <h3 class="ses-title">Sesión 18, 19 y 20: Reformas Constitucionales</h3>
-          <p>Las reformas deben responder a necesidades sociales reales respetando la paz y las libertades públicas. El debate sobre redactar una nueva Constitución frente a aplicar efectivamente la de 1991 implica analizar si los vacíos son del texto o de la voluntad política e institucional para hacerlo cumplir.</p>
-          <h2 class="mod-title">Ensayo Final</h2>
-          <h3 class="ses-title">La Constitución como Transformación Social</h3>
-          <p>La Carta Política de 1991 revolucionó a Colombia al declararla Estado Social de Derecho. Incorporó libertades fundamentales y herramientas como la tutela para combatir la exclusión social históricamente vivida por comunidades vulnerables.</p>
-          <span class="page-num left-num">Pág. 20-21</span>
-        </div>
-        <div class="page-side">
-          <h3 class="ses-title">Desarrollo y Conclusión del Ensayo</h3>
-          <p>Impulsa la democracia participativa al otorgar herramientas como el referendo y la iniciativa popular. No obstante, una Constitución no transforma un país por sí sola: se requiere el compromiso ético, la correcta gestión pública y la veeduría activa de los ciudadanos.</p>
-          <p><b>Conclusión del Ensayo:</b> La Constitución representa el proyecto de sociedad que anhelamos. Conocerla y defenderla es la base de un país incluyente y en paz.</p>
-          <span class="page-num right-num">Pág. 21-22</span>
-        </div>
-      </div>
-
-      <!-- DESPLIEGUE 12: BIBLIOGRAFÍA Y CONTRAPORTADA -->
-      <div class="spread" id="spread-11">
-        <div class="page-side">
-          <h2 class="mod-title">Bibliografía y Cibergrafía</h2>
-          <p><b>Bibliografía:</b></p>
-          <ul>
-            <li>Bobbio, N. (1991). <i>El tiempo de los derechos</i>. Editorial Sistema.</li>
-            <li>Cepeda Espinosa, M. J. (2004). <i>Polémicas constitucionales</i>. Legis.</li>
-            <li>Constitución Política de Colombia. (1991). Editorial Legis.</li>
-          </ul>
-          <p><b>Cibergrafía:</b></p>
-          <ul>
-            <li>Secretaría del Senado: www.secretariasenado.gov.co</li>
-            <li>Corte Constitucional de Colombia: www.corteconstitucional.gov.co</li>
-            <li>Defensoría del Pueblo: www.defensoria.gov.co</li>
-            <li>Organización de las Naciones Unidas: www.un.org/es</li>
-          </ul>
-          <span class="page-num left-num">Pág. 23</span>
-        </div>
-        <div class="page-side cover-side">
-          <h2>FIN DEL LIBRO VIRTUAL</h2>
-          <p><b>Proyecto 50 Horas Constitucionales</b></p><br>
-          <p>Juan Esteban Henao Rivillas</p>
-          <p>Grado 11°6</p>
-          <p>Instituto Técnico Industrial Pascual Bravo</p>
-          <p>Medellín, Colombia</p>
-          <p>2026</p>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <div class="controls">
-    <button class="nav-btn" onclick="prevSpread()">◄ Página Anterior</button>
-    <span id="page-indicator" style="color: #e5c158; font-weight: bold;">Despliegue 1 de 12</span>
-    <button class="nav-btn" onclick="nextSpread()">Página Siguiente ►</button>
-  </div>
-
-  <script>
-    let currentSpread = 0;
-    const spreads = document.querySelectorAll('.spread');
-    const indicator = document.getElementById('page-indicator');
-
-    function openBook() {
-      document.getElementById('welcome-screen').style.display = 'none';
-    }
-
-    function updateSpreads() {
-      spreads.forEach((s, idx) => {
-        if (idx === currentSpread) {
-          s.classList.add('active');
-        } else {
-          s.classList.remove('active');
-        }
-      });
-      indicator.textContent = `Despliegue ${currentSpread + 1} de ${spreads.length} (Págs. ${currentSpread * 2 + 1}-${currentSpread * 2 + 2})`;
-    }
-
-    function goToSpread(index) {
-      currentSpread = index;
-      updateSpreads();
-    }
-
-    function nextSpread() {
-      if (currentSpread < spreads.length - 1) {
-        currentSpread++;
-        updateSpreads();
-      }
-    }
-
-    function prevSpread() {
-      if (currentSpread > 0) {
-        currentSpread--;
-        updateSpreads();
-      }
-    }
-  </script>
+<header><div class="brand"><span>●</span> LIBRO VIRTUAL <span>·</span> ESTUDIOS CONSTITUCIONALES</div><button id="tocToggle" aria-expanded="false">☰ Índice</button></header>
+<main>
+<section class="intro"><div class="eyebrow">50 horas de formación ciudadana</div><h1>Estudio Constitucional y Formación Ciudadana</h1><p>Un enfoque técnico para la transformación social · Constitución Política de Colombia de 1991</p></section>
+<div id="toc"><h3>Índice del libro</h3><p>Selecciona un tema para ir a esa parte del documento.</p><div class="toc-list" id="tocList"></div></div>
+<section class="reader">
+<div class="book-shell"><div id="book"></div></div>
+<div class="controls"><button id="prev" aria-label="Página anterior">‹ Anterior</button><span class="counter" id="counter">Preparando libro…</span><button id="next" aria-label="Página siguiente">Siguiente ›</button><button id="fullscreen">⛶ Pantalla completa</button></div>
+<p class="hint">Usa las flechas para pasar páginas · en celular, desliza · abre el índice para saltar a un módulo.</p>
+</section>
+<section class="bottom"><article class="panel"><h3>Sobre este libro</h3><p>Proyecto de 50 Horas de Estudios Constitucionales. Instituto Técnico Industrial Pascual Bravo, grado 11°6, área de Electricidad y Electrónica.</p></article><article class="panel"><h3>Autor</h3><p>Juan Esteban Henao Rivillas<br>Medellín, Colombia · 22 de octubre de 2026</p></article></section>
+</main>
+<footer>Libro educativo digital · Contenido basado en el PDF del proyecto original.</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
+<script>
+const PDF_PATH = './assets/libro.pdf';
+const sections = [
+['Portada del libro',1],['Tabla de contenido',2],['Introducción',4],['Justificación',5],['Marco legal',6],
+['Módulo 1 · Fundamentos de la Constitución',7],['Sesión 1 · Historia constitucional',7],['Sesión 2 · Principios fundamentales',8],['Sesión 3 · Derechos fundamentales',9],['Sesión 4 · Deberes ciudadanos',11],['Sesión 5 · Línea del tiempo',12],
+['Módulo 2 · Estructura y funcionamiento del Estado',13],['Sesión 6 · Ramas del poder público',13],['Sesión 7 · Órganos de control',14],['Sesión 8 · Participación ciudadana',15],['Sesión 9 · Separación de poderes',16],['Sesión 10 · Debate del presupuesto 2027',17],
+['Módulo 3 · Ciudadanía y democracia',18],['Sesión 11 · Mecanismos de participación',18],['Sesión 12 · Elecciones y representación',20],['Sesión 13 · Elecciones 2026',21],
+['Módulo 4 · Constitución en la vida cotidiana',23],['Sesión 14 · Derechos en la escuela',23],['Sesión 15 · Resolución pacífica de conflictos',24],['Sesión 16 · Casos prácticos',25],
+['Módulo 5 · Realidad social contemporánea',26],['Sesión 17 · Retos actuales',26],['Sesión 18 · Reformas, DD. HH. y paz',27],['Sesión 19 · Libertades ciudadanas',28],['Sesión 20 · ¿Nueva Constitución?',29],
+['Módulo 6 · Motor de transformación social',30],['Conclusiones generales',33],['Cibergrafía',35]
+];
+let flipBook, pdfDoc;
+const $=id=>document.getElementById(id);
+function buildToc(){const list=$('tocList');sections.forEach(([label,p])=>{const b=document.createElement('button');b.textContent=label;b.onclick=()=>{if(flipBook){flipBook.flip(p);$('toc').classList.remove('open');$('tocToggle').setAttribute('aria-expanded','false')}};list.appendChild(b)})}
+function updateCounter(){if(!flipBook)return;let p=flipBook.getCurrentPageIndex()+1;$('counter').textContent=`Hoja ${p} / ${pdfDoc.numPages+1}`;}
+async function start(){
+ try{
+  if(!window.pdfjsLib||!window.St||!window.St.PageFlip)throw new Error('No se pudieron cargar las librerías. Revisa la conexión a internet y vuelve a cargar.');
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  pdfDoc=await pdfjsLib.getDocument(PDF_PATH).promise;
+  const pages=[];
+  const cover=document.createElement('div');cover.className='page';cover.innerHTML='<div class="cover"><div><div class="seal">⚖</div><div class="sub">50 horas constitucionales</div></div><div><h2>Estudio Constitucional y Formación Ciudadana</h2><p>Un enfoque técnico para la transformación social</p></div><div class="author">Juan Esteban Henao Rivillas<br>Instituto Técnico Industrial Pascual Bravo · 11°6<br>Medellín, Colombia · 2026</div></div>';pages.push(cover);
+  for(let n=1;n<=pdfDoc.numPages;n++){
+   const page=await pdfDoc.getPage(n);const vp=page.getViewport({scale:1.25});const canvas=document.createElement('canvas');canvas.width=vp.width;canvas.height=vp.height;
+   await page.render({canvasContext:canvas.getContext('2d'),viewport:vp}).promise;
+   const holder=document.createElement('div');holder.className='page';holder.appendChild(canvas);pages.push(holder);
+  }
+  flipBook=new St.PageFlip($('book'),{width:420,height:594,size:'stretch',minWidth:280,maxWidth:700,minHeight:380,maxHeight:990,showCover:true,drawShadow:true,flippingTime:700,usePortrait:true,startPage:0,autoSize:true,maxShadowOpacity:.35});
+  flipBook.loadFromHTML(pages);flipBook.on('flip',updateCounter);$('counter').textContent=`Hoja 1 / ${pages.length}`;buildToc();
+ }catch(e){$('counter').textContent='No se pudo cargar el libro';$('book').innerHTML='<div style="padding:24px;background:#fffdf7;color:#243447;border-radius:12px;max-width:560px">No se pudo abrir el libro. Comprueba que el archivo <b>assets/libro.pdf</b> esté en el repositorio y que tengas conexión a internet. Detalle: '+e.message+'</div>'}
+}
+$('prev').onclick=()=>flipBook&&flipBook.flipPrev();$('next').onclick=()=>flipBook&&flipBook.flipNext();
+$('tocToggle').onclick=()=>{const open=$('toc').classList.toggle('open');$('tocToggle').setAttribute('aria-expanded',String(open))};
+$('fullscreen').onclick=()=>{const el=$('.reader');if(!document.fullscreenElement)el.requestFullscreen?.();else document.exitFullscreen?.()};
+document.addEventListener('keydown',e=>{if(!flipBook)return;if(e.key==='ArrowRight')flipBook.flipNext();if(e.key==='ArrowLeft')flipBook.flipPrev()});
+start();
+</script>
 </body>
 </html>
